@@ -203,7 +203,7 @@ int main(int argc, char *argv[])
 		free((char*) dest);
 		return -51;
 	}
-    printf("\nSUCCESS: File copy successful. Copied %d bytes.", bytes);
+    printf("\nSUCCESS: File copy successful. Copied %ld bytes.", bytes);
 	free((char*) src);
 	free((char*) dest);
 	return 0;
