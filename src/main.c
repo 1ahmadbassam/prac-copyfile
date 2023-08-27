@@ -14,6 +14,8 @@
 #include "includes/includes.h"
 #include "includes/string.h"
 
+#define NULL 0
+
 const char* appendcopyname(const char *src) {
 	int				i,
 					srcsize,
@@ -27,10 +29,11 @@ const char* appendcopyname(const char *src) {
 	/* Determine file extension position */
 	fileextpos = srcsize;
 	while (fileextpos >= 0 && src[fileextpos] != '.') fileextpos--;
-	if (fileextpos < 0) fileextpos = srcsize;
+	if (fileextpos < 0) fileextpos = srcsize - 1;
 	/* Copy file name to destination and add copy extension to name */
 	strcopy(src, dest, 0, fileextpos);
 	for (i = 0; i < 5; i++) dest[fileextpos + i] = COPYEXT[i];
+	printf("Dest is %s\n", dest);
 	/* Append extension if needed */
 	if (fileextpos < srcsize)
 		for (i = fileextpos; i < srcsize; i++) 
@@ -69,8 +72,8 @@ int main(int argc, char *argv[])
 		printf("Copying %s to %s", src, dest);
 	}
 
-	src = realpath(0, src, 0);
-	dest = realpath(0, dest, 0);
+	src = realpath(NULL, src, 0);
+	dest = realpath(NULL, dest, 0);
 
 	if (!compstr(src, dest)) {
 			printf("\nERR: source and destination filenames are the same.");
