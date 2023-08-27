@@ -83,10 +83,10 @@ int main(int argc, char *argv[])
 	canaccessfile = access(src, R_OK);
 	
 	if (!canaccessfile) {
-		srcfile = fopen(src, "rb");
+		srcfile = fopen(src, "r");
 		if (srcfile) {
 			printf("\nOK: File opened for reading.");
-			destfile = fopen(dest, "wb");
+			destfile = fopen(dest, "w");
 			if (destfile) {
 				printf("\nOK: File opened for writing.");
 				readchar = fgetc(srcfile);
