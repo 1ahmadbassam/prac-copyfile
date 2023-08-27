@@ -27,15 +27,17 @@ const char* appendcopyname(const char *src) {
 	const char 		COPYEXT[6] = "-copy";
 	char			*dest;
 
-	dest = malloc(strsize(src) + 5);
+	srcsize = strsize(src);
+	dest = malloc(srcsize + 5);
 	
 	/* Determine file extension position */
 	fileextpos = srcsize;
 	while (fileextpos >= 0 && src[fileextpos] != '.') fileextpos--;
-	if (fileextpos < 0) fileextpos = srcsize;
+	if (fileextpos < 0) fileextpos = srcsize - 1;
 	/* Copy file name to destination and add copy extension to name */
 	strcopy(src, dest, 0, fileextpos);
 	for (i = 0; i < 5; i++) dest[fileextpos + i] = COPYEXT[i];
+	printf("Dest is %s\n", dest);
 	/* Append extension if needed */
 	if (fileextpos < srcsize)
 		for (i = fileextpos; i < srcsize; i++) 
@@ -80,8 +82,8 @@ int main(int argc, char *argv[])
 		printf("Copying %s to %s", src, dest);
 	}
 
-	src = realpath(0, src, 0);
-	dest = realpath(0, dest, 0);
+	src = realpath(NULL, src, 0);
+	dest = realpath(NULL, dest, 0);
 
 	if (!compstr(src, dest)) {
 			printf("\nERR: source and destination filenames are the same.");
@@ -122,24 +124,21 @@ int main(int argc, char *argv[])
 				destfile = fopen(dest, "wb");
 				if (destfile) {
 					printf("\nOK: File opened in binary mode for writing.");
-					readel = fread(buf, BUF_SIZE, 1, srcfile);
-					while (readel == 1) {
-						if (!fwrite(buf, BUF_SIZE, 1, destfile)) {
+					readel = fread(buf, sizeof(unsigned char), BUF_SIZE, srcfile);
+					while (readel == BUF_SIZE) {
+						if (fwrite(buf, sizeof(unsigned char), BUF_SIZE, destfile) == EOF) {
 							printf("\nERR: Unknown error. An unknown error occured while writing.");
 							fclose(srcfile);
 							fclose(destfile);
 							return -54;
 						}
-						readel = fread(buf, BUF_SIZE, 1, srcfile);
+						readel = fread(buf, sizeof(unsigned char), BUF_SIZE, srcfile);
 					}
-					for (i = 0; i < BUF_SIZE; i++) {
-						if (buf[i] == EOF) break;
-						if (!fwrite(&buf[i], 1, 1, destfile)) {
+					if (fwrite(&buf[i], sizeof(unsigned char), readel, destfile) == EOF) {
 							printf("\nERR: Unknown error. An unknown error occured while writing.");
 							fclose(srcfile);
 							fclose(destfile);
 							return -54;
-						}
 					}
 					fclose(destfile);
 				} else {
