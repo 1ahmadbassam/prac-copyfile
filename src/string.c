@@ -1,5 +1,6 @@
 ﻿#include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
 #include "includes/string.h"
 
 int strsize(const char* str) {
@@ -50,4 +51,14 @@ int nullstr(const char* str, int size) {
 		}
 	}
 	return 0;
+}
+
+const char* tolowerstr(const char* str) {
+	int i;
+	char* lowerstr = malloc(strsize(str));
+
+	for (i = 0; i < strsize(str); i++) {
+		lowerstr[i] = tolower(str[i]);
+	}
+	return lowerstr;
 }

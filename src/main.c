@@ -59,14 +59,17 @@ int main(int argc, char *argv[])
 	const char		*src,
 		 			*dest;
 	
-	char			buf[BUF_SIZE]; 
+	char			buf[BUF_SIZE],
+					*temp,
+					*temp2; 
 
 	FILE 			*srcfile, 
 					*destfile;
 
 	if (argc <= 1) {
 		printf("Required parameter missing: source file\n");
-		printf("Usage: copyfile <source file path> <optional destination file path>\n");
+		printf("Usage: copyfile <source file path> <optional destination file path> <optional read mode>\n");
+		printf("Valid read modes are: binary (default) OR ascii.\n");
 		printf("NOTE: If destination file exists, then it WILL BE OVERWRITTEN.");
 		return 0;
 	} else if (argc == 2) {
@@ -75,7 +78,23 @@ int main(int argc, char *argv[])
 
 		printf("Copying %s to %s", src, dest);
 	} else {
-		if (argc > 3) printf("Ignoring additional arguments...\n");
+		if (argc > 4) printf("Ignoring additional arguments...\n");
+		else {
+			temp = (char*) trim(argv[3]);
+			temp2 = (char*)tolowerstr(temp);
+#ifdef TRIM_USES_MALLOC
+			free(temp);
+#endif
+			if (!compstr(temp2, "ascii")) {
+				printf("Copying in ASCII mode.\n");
+				mode = ASCII;
+			} else if (compstr(temp2, "binary")) {
+				printf("ERR: Invalid mode. Defaulting to binary mode.\n");
+			} else printf("Copying in binary mode.\n");
+#ifdef TOLOWERSTR_USES_MALLOC
+			free(temp2);
+#endif
+		}
 		src = argv[1];
 		dest = argv[2];
 
@@ -126,7 +145,8 @@ int main(int argc, char *argv[])
 					printf("\nOK: File opened in binary mode for writing.");
 					readel = fread(buf, sizeof(unsigned char), BUF_SIZE, srcfile);
 					while (readel == BUF_SIZE) {
-						if (fwrite(buf, sizeof(unsigned char), BUF_SIZE, destfile) == EOF) {
+						i = fwrite(buf, sizeof(unsigned char), BUF_SIZE, destfile);
+						if (i == EOF) {
 							printf("\nERR: Unknown error. An unknown error occured while writing.");
 							fclose(srcfile);
 							fclose(destfile);
@@ -135,7 +155,8 @@ int main(int argc, char *argv[])
 						bytes += BUF_SIZE;
 						readel = fread(buf, sizeof(unsigned char), BUF_SIZE, srcfile);
 					}
-					if (fwrite(&buf[i], sizeof(unsigned char), readel, destfile) == EOF) {
+					i = fwrite(&buf, sizeof(unsigned char), readel, destfile);
+					if (i == EOF) {
 							printf("\nERR: Unknown error. An unknown error occured while writing.");
 							fclose(srcfile);
 							fclose(destfile);
