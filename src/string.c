@@ -1,5 +1,4 @@
-﻿#include <stdio.h>
-#include <stdlib.h>
+﻿#include <stdlib.h>
 #include "includes/string.h"
 
 int strsize(const char* str) {
@@ -40,14 +39,3 @@ int compstr(const char* str1, const char* str2) {
 	}
 	return 0;
 }	
-
-int nullstr(const char* str, int size) {
-	int i;
-
-	for (i = 0; i < size; i++) {
-		if (str[i] != EOF) {
-			return 1;
-		}
-	}
-	return 0;
-}
