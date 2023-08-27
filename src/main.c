@@ -132,6 +132,7 @@ int main(int argc, char *argv[])
 							fclose(destfile);
 							return -54;
 						}
+						bytes += BUF_SIZE;
 						readel = fread(buf, sizeof(unsigned char), BUF_SIZE, srcfile);
 					}
 					if (fwrite(&buf[i], sizeof(unsigned char), readel, destfile) == EOF) {
@@ -140,6 +141,7 @@ int main(int argc, char *argv[])
 							fclose(destfile);
 							return -54;
 					}
+					bytes += readel;
 					fclose(destfile);
 				} else {
 					printf("\nERR: Unknown error. File cannot be opened for writing.");
