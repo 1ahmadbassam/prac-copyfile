@@ -102,14 +102,28 @@ int main(int argc, char *argv[])
 		printf("Copying %s to %s", src, dest);
 	}
 
+#ifdef _WIN32
 	src = realpath(NULL, src, 0);
-	
+#else
+	src = realpath(src, NULL);
+#endif
+
 #ifdef DEST_MALLOC
+	#ifdef _WIN32
 	temp = realpath(NULL, dest, 0);
 	free((char*) dest);
 	dest = temp;
+	#else
+	temp = realpath(dest, NULL);
+	free((char*) dest);
+	dest = temp;
+	#endif
 #else
+	#ifdef _WIN32
 	dest = realpath(NULL, dest, 0);
+	#else
+	dest = realpath(dest, NULL);
+	#endif
 #endif
 
 	/* For safety purposes, reset the temp pointers */
