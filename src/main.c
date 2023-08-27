@@ -29,7 +29,7 @@ const char* appendcopyname(const char *src) {
 
 	srcsize = strsize(src);
 	dest = malloc(srcsize + 5);
-	
+
 	/* Determine file extension position */
 	fileextpos = srcsize;
 	while (fileextpos >= 0 && src[fileextpos] != '.') fileextpos--;
