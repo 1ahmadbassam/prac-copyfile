@@ -1,4 +1,6 @@
-﻿#include <stdlib.h>
+﻿#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
 #include "includes/string.h"
 
 int strsize(const char* str) {
@@ -38,4 +40,25 @@ int compstr(const char* str1, const char* str2) {
 		if (str1[i] != str2[i]) return 1;
 	}
 	return 0;
-}	
+}
+
+int nullstr(const char* str, int size) {
+	int i;
+
+	for (i = 0; i < size; i++) {
+		if (str[i] != EOF) {
+			return 1;
+		}
+	}
+	return 0;
+}
+
+const char* tolowerstr(const char* str) {
+	int i;
+	char* lowerstr = malloc(strsize(str));
+
+	for (i = 0; i < strsize(str); i++) {
+		lowerstr[i] = tolower(str[i]);
+	}
+	return lowerstr;
+}
