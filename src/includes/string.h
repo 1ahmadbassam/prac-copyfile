@@ -6,5 +6,6 @@ extern int strcopy(const char* src, char* dest, int start, int end);
 #define TRIM_USES_MALLOC
 extern const char* trim(const char* str);
 extern int compstr(const char* str1, const char* str2);
+extern int nullstr(const char* str, int size);
 
 #endif
