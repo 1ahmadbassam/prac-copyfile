@@ -14,8 +14,6 @@
 #include "includes/includes.h"
 #include "includes/string.h"
 
-#define NULL 0
-
 const char* appendcopyname(const char *src) {
 	int				i,
 					srcsize,
