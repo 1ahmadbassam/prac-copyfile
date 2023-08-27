@@ -14,14 +14,6 @@
 #include "includes/includes.h"
 #include "includes/string.h"
 
-int detfileext(const char* str, const int size) {
-	int i = size - 1;
-
-	while (i >= 0 && str[i] != '.') i--;
-	if (i < 0) return size - 1;
-	else return i;
-}
-
 const char* appendcopyname(const char *src) {
 	int				i,
 					srcsize,
