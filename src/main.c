@@ -6,8 +6,6 @@
 #include <io.h>
 #define R_OK 4
 #define access _access
-#include <direct.h>
-#define getcwd _getcwd
 #define realpath _fullpath
 #else
 	#include <unistd.h>
