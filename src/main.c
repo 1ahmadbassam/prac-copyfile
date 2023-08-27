@@ -14,6 +14,11 @@
 #include "includes/includes.h"
 #include "includes/string.h"
 
+#define BINARY 0
+#define ASCII 1
+/* Size of buffer technically controls read-speed in binary mode. */
+#define BUF_SIZE 16
+
 const char* appendcopyname(const char *src) {
 	int				i,
 					srcsize,
@@ -23,6 +28,7 @@ const char* appendcopyname(const char *src) {
 	char			*dest;
 
 	srcsize = strsize(src);
+#define DEST_MALLOC
 	dest = malloc(srcsize + 5);
 
 	/* Determine file extension position */
@@ -32,7 +38,6 @@ const char* appendcopyname(const char *src) {
 	/* Copy file name to destination and add copy extension to name */
 	strcopy(src, dest, 0, fileextpos);
 	for (i = 0; i < 5; i++) dest[fileextpos + i] = COPYEXT[i];
-	printf("Dest is %s\n", dest);
 	/* Append extension if needed */
 	if (fileextpos < srcsize)
 		for (i = fileextpos; i < srcsize; i++)
@@ -42,8 +47,11 @@ const char* appendcopyname(const char *src) {
 
 int main(int argc, char *argv[])
 {
-	int 			canaccessfile,
-					readchar;
+	int 			i,
+					canaccessfile,
+					readchar,
+					mode = BINARY;
+	size_t			readel;	
 	long 			bytes = 0;
 
 
@@ -70,11 +78,12 @@ int main(int argc, char *argv[])
 		printf("Copying %s to %s", src, dest);
 	} else {
 		if (argc > 4) printf("Ignoring additional arguments...\n");
-		else {
+		else if (argc == 4) {
 			temp = (char*) trim(argv[3]);
 			temp2 = (char*)tolowerstr(temp);
 #ifdef TRIM_USES_MALLOC
 			free(temp);
+			temp = NULL;
 #endif
 			if (!compstr(temp2, "ascii")) {
 				printf("Copying in ASCII mode.\n");
@@ -84,6 +93,7 @@ int main(int argc, char *argv[])
 			} else printf("Copying in binary mode.\n");
 #ifdef TOLOWERSTR_USES_MALLOC
 			free(temp2);
+			temp2 = NULL;
 #endif
 		}
 		src = argv[1];
@@ -93,29 +103,49 @@ int main(int argc, char *argv[])
 	}
 
 	src = realpath(NULL, src, 0);
+	
+#ifdef DEST_MALLOC
+	temp = realpath(NULL, dest, 0);
+	free((char*) dest);
+	dest = temp;
+#else
 	dest = realpath(NULL, dest, 0);
+#endif
+
+	/* For safety purposes, reset the temp pointers */
+	temp = NULL; 
+	temp2 = NULL;
 
 	if (!compstr(src, dest)) {
 			printf("\nERR: source and destination filenames are the same.");
+			free((char*) src);
+			free((char*) dest);
 			return -28;
 	}
 
 	canaccessfile = access(src, R_OK);
 
 	if (!canaccessfile) {
-		srcfile = fopen(src, "r");
-		if (srcfile) {
-			printf("\nOK: File opened for reading.");
-			destfile = fopen(dest, "w");
-			if (destfile) {
-				printf("\nOK: File opened for writing.");
-				readchar = fgetc(srcfile);
-				while (readchar != EOF) {
-					fputc(readchar, destfile);
-					bytes++;
+		if (mode == ASCII) {
+			srcfile = fopen(src, "r");
+			if (srcfile) {
+				printf("\nOK: File opened in ASCII mode for reading.");
+				destfile = fopen(dest, "w");
+				if (destfile) {
+					printf("\nOK: File opened in ASCII mode for writing.");
 					readchar = fgetc(srcfile);
+					while (readchar != EOF) {
+						fputc(readchar, destfile);
+						bytes++;
+						readchar = fgetc(srcfile);
+					} 
+					fclose(destfile);
+				} else {
+					printf("\nERR: Unknown error. File cannot be opened for writing.");
+					fclose(srcfile);
+					return -53;
 				}
-				fclose(destfile);
+				fclose(srcfile);
 			} else {
 				printf("\nERR: Unknown error. File cannot be opened for reading.");
 				return -52;
@@ -134,6 +164,8 @@ int main(int argc, char *argv[])
 							printf("\nERR: Unknown error. An unknown error occured while writing.");
 							fclose(srcfile);
 							fclose(destfile);
+							free((char*) src);
+							free((char*) dest);
 							return -54;
 						}
 						bytes += BUF_SIZE;
@@ -144,6 +176,8 @@ int main(int argc, char *argv[])
 							printf("\nERR: Unknown error. An unknown error occured while writing.");
 							fclose(srcfile);
 							fclose(destfile);
+							free((char*) src);
+							free((char*) dest);
 							return -54;
 					}
 					bytes += readel;
@@ -151,20 +185,26 @@ int main(int argc, char *argv[])
 				} else {
 					printf("\nERR: Unknown error. File cannot be opened for writing.");
 					fclose(srcfile);
+					free((char*) src);
+					free((char*) dest);
 					return -53;
 				}
 				fclose(srcfile);
-				return -53;
-			}
-			fclose(srcfile);
-		} else {
+			} else {
 			printf("\nERR: Unknown error. File cannot be opened for reading.");
+			free((char*) src);
+			free((char*) dest);
 			return -52;
-		}
+			} 
+		} else printf("\nERR: Invalid mode requested. Contact program support team.");
 	} else {
 		printf("\nERR: File cannot be accessed for reading. Error code %d.", canaccessfile);
+		free((char*) src);
+		free((char*) dest);
 		return -51;
 	}
     printf("\nSUCCESS: File copy successful. Copied %d bytes.", bytes);
+	free((char*) src);
+	free((char*) dest);
 	return 0;
 }
