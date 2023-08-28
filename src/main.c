@@ -9,7 +9,6 @@
 #include <io.h>
 #define R_OK 4
 #define access _access
-#define realpath 
 #else
 	#include <unistd.h>
 #endif
