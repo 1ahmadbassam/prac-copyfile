@@ -1,18 +1,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "includes/includes.h"
+#include "includes/string.h" 
+
 /* Cross-compatibility between systems */
 #ifdef _WIN32
 #include <io.h>
 #define R_OK 4
 #define access _access
-#define realpath _fullpath
+#define realpath 
 #else
 	#include <unistd.h>
 #endif
-
-#include "includes/includes.h"
-#include "includes/string.h"
 
 #define BINARY 0
 #define ASCII 1
@@ -101,28 +101,28 @@ int main(int argc, char *argv[])
 
 		printf("Copying %s to %s", src, dest);
 	}
-
+	
 #ifdef _WIN32
-	src = realpath(NULL, src, 0);
+	src = (char*) _fullpath(NULL, src, 0);
 #else
-	src = realpath(src, NULL);
+	src = (char*) realpath(src, NULL);
 #endif
 
 #ifdef DEST_MALLOC
 	#ifdef _WIN32
-	temp = realpath(NULL, dest, 0);
+	temp = (char*) _fullpath(NULL, dest, 0);
 	free((char*) dest);
 	dest = temp;
 	#else
-	temp = realpath(dest, NULL);
+	temp = (char*) realpath(dest, NULL);
 	free((char*) dest);
 	dest = temp;
 	#endif
 #else
 	#ifdef _WIN32
-	dest = realpath(NULL, dest, 0);
+	dest = (char*) _fullpath(NULL, dest, 0);
 	#else
-	dest = realpath(dest, NULL);
+	dest = (char*) realpath(dest, NULL);
 	#endif
 #endif
 

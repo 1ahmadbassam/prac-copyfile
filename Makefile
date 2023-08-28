@@ -1,6 +1,6 @@
 IDIR=includes
 CC=gcc
-CPPFLAGS=-Wall
+CPPFLAGS=-Wall -std=c89 -U__STRICT_ANSI__
 CFLAGS=-I$(IDIR)
 VPATH=src
 _DEPS= string.h includes.h
